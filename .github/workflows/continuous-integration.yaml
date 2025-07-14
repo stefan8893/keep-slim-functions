@@ -1,0 +1,55 @@
+﻿name: Continuous Integration
+
+on:
+  push:
+    branches: ['**']
+
+jobs:
+  ci:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run Conventional Commits check
+        uses: webiny/action-conventional-commits@v1.3.0
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup dotnet 9.x
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.x'
+
+      - name: Build
+        shell: pwsh
+        run: dotnet build --configuration Release
+
+      - name: Test
+        shell: pwsh
+        run: |
+          dotnet test `
+          -property:Configuration=Release `
+          -property:CollectCoverage=true `
+          -property:CoverletOutputFormat='cobertura'
+
+      - name: Generate Coverage Report
+        uses: danielpalme/ReportGenerator-GitHub-Action@5.4.8
+        with:
+          reports: 'test/**/coverage.cobertura.xml'
+          targetdir: 'CoverageReport'
+          reporttypes: 'HtmlInline;MarkdownSummaryGithub;Cobertura'
+          verbosity: 'Info'
+          title: 'Simple Trading Code Coverage'
+          tag: '${{ github.run_number }}_${{ github.run_id }}'
+          toolpath: 'reportgeneratortool'
+
+      - name: Upload Coverage Report Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CoverageReport
+          path: CoverageReport
+
+      - name: Publish Coverage in Build Summary
+        run: cat CoverageReport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
+        shell: bash
