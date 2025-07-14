@@ -1,0 +1,4 @@
+{
+    "azureFunctions.deploySubpath": "src/KeepSlimFunctions/bin/Release/net9.0/publish",
+    "azureFunctions.projectLanguage": "C#"
+}

@@ -40,7 +40,7 @@ jobs:
           targetdir: 'CoverageReport'
           reporttypes: 'HtmlInline;MarkdownSummaryGithub;Cobertura'
           verbosity: 'Info'
-          title: 'Simple Trading Code Coverage'
+          title: 'Keep Slim Code Coverage'
           tag: '${{ github.run_number }}_${{ github.run_id }}'
           toolpath: 'reportgeneratortool'
 
