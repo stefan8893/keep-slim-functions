@@ -6,11 +6,11 @@ namespace KeepSlim.Functions.Http;
 public class BodyDataDto
 {
     public required DateTime RecordedAt { get; init; }
-    public double Weight { get; init; }
-    public double MuscleMass { get; init; }
-    public double BodyFat { get; init; } = 0;
-    public double Water { get; init; } = 0;
-    public double Bmi { get; init; } = 0;
+    public required double Weight { get; init; }
+    public required double MuscleMass { get; init; }
+    public required double BodyFat { get; init; }
+    public required double Water { get; init; }
+    public required double Bmi { get; init; }
 
     public static BodyDataDto FromTableEntity(TableEntity tableEntity)
     {
