@@ -12,6 +12,7 @@ public class BodyDataDto
     public required double BodyFat { get; init; }
     public required double Water { get; init; }
     public required double Bmi { get; init; }
+    public required int DailyCalorieRequirement { get; init; }
 
     public static BodyDataDto FromTableEntity(TableEntity tableEntity)
     {
@@ -23,6 +24,7 @@ public class BodyDataDto
             BodyFat = GetDoubleSafe(tableEntity, "BodyFat"),
             Water = GetDoubleSafe(tableEntity, "BodyWater"),
             Bmi = GetDoubleSafe(tableEntity, "Bmi"),
+            DailyCalorieRequirement = tableEntity.GetInt32("DailyCalorieRequirement") ?? throw new ArgumentNullException(nameof(DailyCalorieRequirement))
         };
     }
 
