@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using Azure.Data.Tables;
+using KeepSlim.Functions;
 
 namespace KeepSlim.Functions.Http;
 
@@ -16,15 +17,15 @@ public class BodyDataDto
     {
         return new BodyDataDto
         {
-            RecordedAt = DateTime.ParseExact(tableEntity.RowKey, "yyyy-MM-ddThh:mm:ss", CultureInfo.InvariantCulture),
+            RecordedAt = DateTime.ParseExact(tableEntity.RowKey, "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture),
             Weight = GetDoubleSafe(tableEntity, "Weight"),
-            MuscleMass =GetDoubleSafe(tableEntity, "MuscleMass"),
+            MuscleMass = GetDoubleSafe(tableEntity, "MuscleMass"),
             BodyFat = GetDoubleSafe(tableEntity, "BodyFat"),
             Water = GetDoubleSafe(tableEntity, "BodyWater"),
             Bmi = GetDoubleSafe(tableEntity, "Bmi"),
         };
     }
-    
+
     private static double GetDoubleSafe(TableEntity entity, string key)
     {
         if (!entity.TryGetValue(key, out var val))

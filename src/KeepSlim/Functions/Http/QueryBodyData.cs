@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using KeepSlim.Functions;
 
 namespace KeepSlim.Functions.Http;
 
@@ -26,10 +27,11 @@ public class QueryBodyData(ILogger<QueryBodyData> logger, TableClient bodyDataTa
 
         var startDateStartOfDay = startDate.ToDateTime(TimeOnly.MinValue);
         var endDateEndOfDay = endDate.ToDateTime(new TimeOnly(23, 59, 59, 999));
-        logger.LogInformation("Fetching body data for the time range: {startDate} - {endDate}", startDate,
+        logger.LogInformation("Fetching body data for the time range: {startDate:o} - {endDate:o}", startDateStartOfDay,
             endDateEndOfDay);
-        
-        var bodyData = await  GetBodyData(startDateStartOfDay, endDateEndOfDay);
+
+
+        var bodyData = await GetBodyData(startDateStartOfDay, endDateEndOfDay);
         return new JsonResult(bodyData)
         {
             StatusCode = StatusCodes.Status200OK
@@ -38,20 +40,23 @@ public class QueryBodyData(ILogger<QueryBodyData> logger, TableClient bodyDataTa
 
     private async Task<IEnumerable<BodyDataDto>> GetBodyData(DateTime startDate, DateTime endDate)
     {
+        var filter = ToFilter(startDate, endDate);
+        logger.LogInformation("Query filter: {filter}", filter);
+
         var bodyData = new List<BodyDataDto>();
         await foreach (var page in bodyDataTableClient
-                           .QueryAsync<TableEntity>(ToFilter(startDate, endDate))
+                           .QueryAsync<TableEntity>(filter)
                            .AsPages(pageSizeHint: 1000))
         {
             bodyData.AddRange(page.Values.Select(BodyDataDto.FromTableEntity));
         }
-        
+
         return bodyData;
     }
 
     private static string ToFilter(DateTime startDate, DateTime endDate)
     {
         return
-            $"PartitionKey eq 'body_data' and RowKey ge '{startDate:yyyy-MM-ddThh:mm:ss}' and RowKey le '{endDate:yyyy-MM-ddThh:mm:ss}'";
+            $"PartitionKey eq 'body_data' and RowKey ge '{startDate:yyyy-MM-ddTHH:mm:ss}' and RowKey le '{endDate:yyyy-MM-ddTHH:mm:ss}'";
     }
 }
