@@ -1,8 +1,7 @@
 ﻿using System.Globalization;
 using Azure.Data.Tables;
-using KeepSlim.Functions;
 
-namespace KeepSlim.Functions.Http;
+namespace KeepSlim.Functions.BodyData;
 
 public class BodyDataDto
 {

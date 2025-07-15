@@ -1,5 +1,6 @@
 using Azure.Data.Tables;
 using Azure.Identity;
+using KeepSlim.Functions.BodyData;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -18,5 +19,8 @@ builder.Services.AddSingleton(_ =>
     var credential = new DefaultAzureCredential();
     return new TableClient(new Uri(storageUri), tableName, credential);
 });
+
+builder.Services.AddScoped<GetBodyData>();
+builder.Services.AddScoped<DeleteBodyData>();
 
 builder.Build().Run();

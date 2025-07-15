@@ -1,23 +1,19 @@
-using Azure.Data.Tables;
-using JetBrains.Annotations;
+﻿using Azure.Data.Tables;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using KeepSlim.Functions;
 
-namespace KeepSlim.Functions.Http;
+namespace KeepSlim.Functions.BodyData;
 
-[UsedImplicitly]
-public class QueryBodyData(ILogger<QueryBodyData> logger, TableClient bodyDataTableClient)
+public class GetBodyData(ILogger<BodyDataFunction> logger, TableClient bodyDataTableClient)
 {
-    [Function("body-data")]
-    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest request)
+    public async Task<ActionResult> Execute(IQueryCollection queryString)
     {
         logger.LogInformation("Querying body data");
-        logger.LogDebug("Query String: {queryString}", request.QueryString);
-        if (!DateOnly.TryParse(request.Query["startDate"], out var startDate) ||
-            !DateOnly.TryParse(request.Query["endDate"], out var endDate))
+        logger.LogDebug("Query String: {queryString}", queryString);
+        
+        if (!DateOnly.TryParse(queryString["startDate"], out var startDate) ||
+            !DateOnly.TryParse(queryString["endDate"], out var endDate))
         {
             logger.LogError("Missing start and/or end date.");
             var today = DateTime.Today;
@@ -31,14 +27,15 @@ public class QueryBodyData(ILogger<QueryBodyData> logger, TableClient bodyDataTa
             endDateEndOfDay);
 
 
-        var bodyData = await GetBodyData(startDateStartOfDay, endDateEndOfDay);
+        var bodyData = await LoadBodyDataFromAzureTables(startDateStartOfDay, endDateEndOfDay);
         return new JsonResult(bodyData)
         {
             StatusCode = StatusCodes.Status200OK
         };
     }
-
-    private async Task<IEnumerable<BodyDataDto>> GetBodyData(DateTime startDate, DateTime endDate)
+    
+    
+    private async Task<IEnumerable<BodyDataDto>> LoadBodyDataFromAzureTables(DateTime startDate, DateTime endDate)
     {
         var filter = ToFilter(startDate, endDate);
         logger.LogInformation("Query filter: {filter}", filter);
