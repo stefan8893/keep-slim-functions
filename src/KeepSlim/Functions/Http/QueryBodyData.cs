@@ -56,7 +56,10 @@ public class QueryBodyData(ILogger<QueryBodyData> logger, TableClient bodyDataTa
 
     private static string ToFilter(DateTime startDate, DateTime endDate)
     {
+        var startDateFormatted = startDate.ToString(Constants.RowKeyDateTimeFormatString);
+        var endDateFormatted = endDate.ToString(Constants.RowKeyDateTimeFormatString);
+        
         return
-            $"PartitionKey eq 'body_data' and RowKey ge '{startDate:yyyy-MM-ddTHH:mm:ss}' and RowKey le '{endDate:yyyy-MM-ddTHH:mm:ss}'";
+            $"PartitionKey eq 'body_data' and RowKey ge '{startDateFormatted}' and RowKey le '{endDateFormatted}'";
     }
 }

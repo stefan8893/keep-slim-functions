@@ -17,7 +17,7 @@ public class BodyDataDto
     {
         return new BodyDataDto
         {
-            RecordedAt = DateTime.ParseExact(tableEntity.RowKey, "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture),
+            RecordedAt = DateTime.ParseExact(tableEntity.RowKey, Constants.RowKeyDateTimeFormatString, CultureInfo.InvariantCulture),
             Weight = GetDoubleSafe(tableEntity, "Weight"),
             MuscleMass = GetDoubleSafe(tableEntity, "MuscleMass"),
             BodyFat = GetDoubleSafe(tableEntity, "BodyFat"),
