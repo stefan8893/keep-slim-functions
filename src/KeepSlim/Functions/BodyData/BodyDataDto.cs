@@ -39,7 +39,7 @@ public class BodyDataDto
             long l => l,
             float f => f,
             null => throw new InvalidCastException("Value is null."),
-            _ => throw new InvalidCastException($"Value is not of type {val.GetType()} and can therefore not convert to type double.")
+            _ => throw new InvalidCastException($"Value is not of type {val.GetType()} and cannot converted to type double.")
         };
     }
 }
