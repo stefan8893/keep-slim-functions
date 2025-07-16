@@ -1,6 +1,7 @@
 using Azure.Data.Tables;
 using Azure.Identity;
 using KeepSlim.Functions.BodyData;
+using KeepSlim.Functions.CsvImport;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -22,5 +23,6 @@ builder.Services.AddSingleton(_ =>
 
 builder.Services.AddScoped<GetBodyData>();
 builder.Services.AddScoped<DeleteBodyData>();
+builder.Services.AddScoped<ImportCsv>();
 
 builder.Build().Run();

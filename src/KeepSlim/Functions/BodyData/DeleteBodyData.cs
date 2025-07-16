@@ -1,4 +1,5 @@
-﻿using Azure.Data.Tables;
+﻿using System.Globalization;
+using Azure.Data.Tables;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -15,12 +16,12 @@ public class DeleteBodyData(ILogger<BodyDataFunction> logger, TableClient bodyDa
         if (!DateTime.TryParse(queryString["recordedAt"], out var recordedAt))
         {
             logger.LogError("Missing record identifier.");
-            var now = DateTime.Now.ToString(Constants.RowKeyDateTimeFormatString);
+            var now = DateTime.Now.ToString(Constants.RowKeyDateTimeFormatString, CultureInfo.InvariantCulture);
             return new BadRequestObjectResult(
                 $"Missing record identifier. e.g. recordedAt={now}");
         }
         
-        var rowKey = recordedAt.ToString(Constants.RowKeyDateTimeFormatString);
+        var rowKey = recordedAt.ToString(Constants.RowKeyDateTimeFormatString, CultureInfo.InvariantCulture);
         logger.LogInformation("Deleting record with row key '{rowKey}'", rowKey);
         await bodyDataTableClient.DeleteEntityAsync("body_data", rowKey);
         

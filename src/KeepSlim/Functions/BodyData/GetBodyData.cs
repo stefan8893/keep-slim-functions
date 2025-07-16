@@ -1,4 +1,5 @@
 ﻿using Azure.Data.Tables;
+using KeepSlim.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -28,35 +29,19 @@ public class GetBodyData(ILogger<BodyDataFunction> logger, TableClient bodyDataT
 
 
         var bodyData = await LoadBodyDataFromAzureTables(startDateStartOfDay, endDateEndOfDay);
-        return new JsonResult(bodyData)
+        return new JsonResult(bodyData.Select(BodyDataDto.FromBodyDataTableEntity))
         {
             StatusCode = StatusCodes.Status200OK
         };
     }
     
-    
-    private async Task<IEnumerable<BodyDataDto>> LoadBodyDataFromAzureTables(DateTime startDate, DateTime endDate)
+    private async Task<IEnumerable<BodyDataTableEntity>> LoadBodyDataFromAzureTables(DateTime startDate, DateTime endDate)
     {
-        var filter = ToFilter(startDate, endDate);
+        var filter = (startDate, endDate).ToTableFilter();
         logger.LogInformation("Query filter: {filter}", filter);
 
-        var bodyData = new List<BodyDataDto>();
-        await foreach (var page in bodyDataTableClient
-                           .QueryAsync<TableEntity>(filter)
-                           .AsPages(pageSizeHint: 1000))
-        {
-            bodyData.AddRange(page.Values.Select(BodyDataDto.FromTableEntity));
-        }
-
-        return bodyData;
-    }
-
-    private static string ToFilter(DateTime startDate, DateTime endDate)
-    {
-        var startDateFormatted = startDate.ToString(Constants.RowKeyDateTimeFormatString);
-        var endDateFormatted = endDate.ToString(Constants.RowKeyDateTimeFormatString);
-        
-        return
-            $"PartitionKey eq 'body_data' and RowKey ge '{startDateFormatted}' and RowKey le '{endDateFormatted}'";
+        return await bodyDataTableClient
+            .QueryAsync<BodyDataTableEntity>(filter)
+            .ToListAsync();
     }
 }
