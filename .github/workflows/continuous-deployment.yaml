@@ -48,25 +48,28 @@ jobs:
       Version: ${{ needs.has_next_version.outputs.Version }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.CI_PAT }}
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.x'
-        
+
       - name: Publish Function App
         run: dotnet publish ./src/KeepSlim/KeepSlim.csproj -c Release -o ./publish -property:version=${{ env.Version }}
-        
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          
+
       - name: Deploy to Azure Function App
         uses: azure/functions-action@v1
         with:
-          app-name:  ${{ vars.FUNCTION_APP_NAME }}
+          app-name: ${{ vars.FUNCTION_APP_NAME }}
           package: ./publish
