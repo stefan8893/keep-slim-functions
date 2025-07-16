@@ -76,7 +76,7 @@ public class ImportCsv(ILogger<ImportCsv> logger, TableClient bodyDataTableClien
         catch (Exception exception)
         {
             logger.LogError(exception, "Error while parsing csv file");
-            return new BadRequestObjectResult("Error while parsing csv file");
+            return new BadRequestObjectResult("Invalid csv file");
         }
     }
 
