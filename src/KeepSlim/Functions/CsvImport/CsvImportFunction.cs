@@ -9,14 +9,13 @@ namespace KeepSlim.Functions.CsvImport;
 public class CsvImportFunction(ImportCsv importCsv)
 {
     [Function("csv-import")]
-    public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest request)
+    public Task<ActionResult> Run(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest request)
     {
-        return request.Method switch
-        {
-            "GET" => await importCsv.Execute(request, dryRun: true),
-            "POST" => await importCsv.Execute(request, dryRun: false),
-            _ => new StatusCodeResult(StatusCodes.Status405MethodNotAllowed)
-        };
+        var isDryRunKeyPresent = request.Query.ContainsKey("dryRun");
+        var isDryRunValuePresent = bool.TryParse(request.Query["dryRun"], out var dryRunValue);
+        var dryRun = isDryRunValuePresent ? dryRunValue : isDryRunKeyPresent ;
+        
+        return importCsv.Execute(request, dryRun);
     }
 }
