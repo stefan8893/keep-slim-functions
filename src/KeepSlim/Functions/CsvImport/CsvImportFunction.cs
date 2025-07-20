@@ -14,8 +14,8 @@ public class CsvImportFunction(ImportCsv importCsv)
     {
         var isDryRunKeyPresent = request.Query.ContainsKey("dryRun");
         var isDryRunValuePresent = bool.TryParse(request.Query["dryRun"], out var dryRunValue);
-        var dryRun = isDryRunValuePresent ? dryRunValue : isDryRunKeyPresent ;
-        
+        var dryRun = isDryRunValuePresent ? dryRunValue : isDryRunKeyPresent;
+
         return importCsv.Execute(request, dryRun);
     }
 }

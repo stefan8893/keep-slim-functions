@@ -15,7 +15,7 @@ public class ImportCsv(ILogger<ImportCsv> logger, TableClient bodyDataTableClien
     public async Task<ActionResult> Execute(HttpRequest request, bool dryRun)
     {
         logger.LogInformation("Importing csv file. dry run: {dryRun}", dryRun);
-        var parsingResult = await ParseCsv(request.Body);
+        var parsingResult = await TryParseCsv(request.Body);
 
         if (parsingResult.IsT1) return parsingResult.AsT1;
         var csvEntries = parsingResult.AsT0;
