@@ -54,9 +54,9 @@ jobs:
           token: ${{ secrets.CI_PAT }}
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: '9.x'
+          dotnet-version: '10.x'
 
       - name: Publish Function App
         run: dotnet publish ./src/KeepSlim/KeepSlim.csproj -c Release -o ./publish -property:version=${{ env.Version }}
