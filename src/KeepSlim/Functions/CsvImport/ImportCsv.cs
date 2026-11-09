@@ -1,7 +1,6 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Azure.Data.Tables;
 using CsvHelper;
-using CsvHelper.Configuration;
 using KeepSlim.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -91,16 +90,16 @@ public class ImportCsv(ILogger<ImportCsv> logger, TableClient bodyDataTableClien
 
         memoryStream.Position = 0;
         using var reader = new StreamReader(memoryStream);
-        using var csvReader = new CsvReader(reader,
-            new CsvConfiguration(CultureInfo.InvariantCulture)
-            {
-                Delimiter = ",",
-                HasHeaderRecord = true,
-                ShouldSkipRecord = ctx => ctx.Row.Parser.Row <= 2,
-                IgnoreBlankLines = true
-            });
 
-        csvReader.Context.RegisterClassMap<CsvBodyDataRecordMap>();
+        await using var csvReader = CsvReader.Create(reader,
+            new CsvReaderOptions
+            {
+                Separator = ',',
+                HasHeader = true,
+                ShouldSkipRecord = x => x.RowNumber <= 2,
+                SkipEmptyLines = true,
+                FormatProvider = CultureInfo.InvariantCulture
+            });
 
         return await csvReader
             .GetRecordsAsync<CsvBodyDataRecord>()
