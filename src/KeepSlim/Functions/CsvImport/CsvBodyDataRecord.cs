@@ -1,24 +1,39 @@
 ﻿using System.Globalization;
-using CsvHelper.Configuration;
-using JetBrains.Annotations;
+using CsvHelper;
 
 namespace KeepSlim.Functions.CsvImport;
 
-[UsedImplicitly]
-public class CsvBodyDataRecord
+[CsvRecord]
+public partial class CsvBodyDataRecord
 {
+    [CsvColumn(Index = 0)]
     public required string Datum { get; set; }
+
+    [CsvColumn(Index = 1)]
     public required string Zeit { get; set; }
 
     public DateTime RecordedAt =>
         DateTime.ParseExact($"{Datum} {Zeit}", "dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture);
 
+    [CsvColumn(Index = 2)]
     public required double Gewicht { get; set; }
+
+    [CsvColumn(Index = 3)]
     public required double Fett { get; set; }
+
+    [CsvColumn(Index = 4)]
     public required double Muskel { get; set; }
+
+    [CsvColumn(Index = 5)]
     public required double BMI { get; set; }
+
+    [CsvColumn(Index = 6)]
     public required double Wasser { get; set; }
+
+    [CsvColumn(Index = 7)]
     public required int Kalorienverbrauch { get; set; }
+
+    [CsvColumn(Index = 8)]
     public required string Geräte { get; set; }
 
     public BodyDataTableEntity ToTableEntity()
@@ -33,21 +48,5 @@ public class CsvBodyDataRecord
             Bmi = BMI,
             DailyCalorieRequirement = Kalorienverbrauch,
         };
-    }
-}
-
-public class CsvBodyDataRecordMap : ClassMap<CsvBodyDataRecord>
-{
-    public CsvBodyDataRecordMap()
-    {
-        Map(m => m.Datum).Index(0);
-        Map(m => m.Zeit).Index(1);
-        Map(m => m.Gewicht).Index(2).TypeConverterOption.CultureInfo(CultureInfo.InvariantCulture);
-        Map(m => m.Fett).Index(3).TypeConverterOption.CultureInfo(CultureInfo.InvariantCulture);
-        Map(m => m.Muskel).Index(4).TypeConverterOption.CultureInfo(CultureInfo.InvariantCulture);
-        Map(m => m.BMI).Index(5).TypeConverterOption.CultureInfo(CultureInfo.InvariantCulture);
-        Map(m => m.Wasser).Index(6).TypeConverterOption.CultureInfo(CultureInfo.InvariantCulture);
-        Map(m => m.Kalorienverbrauch).Index(7);
-        Map(m => m.Geräte).Index(8);
     }
 }

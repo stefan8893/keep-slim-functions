@@ -1,4 +1,5 @@
-﻿using Azure.Data.Tables;
+﻿using System.Globalization;
+using Azure.Data.Tables;
 using KeepSlim.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,8 +14,8 @@ public class GetBodyData(ILogger<BodyDataFunction> logger, TableClient bodyDataT
         logger.LogInformation("Querying body data");
         logger.LogDebug("Query String: {queryString}", queryString);
         
-        if (!DateOnly.TryParse(queryString["startDate"], out var startDate) ||
-            !DateOnly.TryParse(queryString["endDate"], out var endDate))
+        if (!DateOnly.TryParse(queryString["startDate"], CultureInfo.InvariantCulture, out var startDate) ||
+            !DateOnly.TryParse(queryString["endDate"], CultureInfo.InvariantCulture, out var endDate))
         {
             logger.LogError("Missing start and/or end date.");
             var today = DateTime.Today;
