@@ -53,7 +53,7 @@ public class ImportCsv(ILogger<ImportCsv> logger, TableClient bodyDataTableClien
     private async Task<IEnumerable<BodyDataTableEntity>> LoadBodyDataFromAzureTables(
         IReadOnlyList<CsvBodyDataRecord> csvEntries)
     {
-        if (!csvEntries.Any())
+        if (csvEntries.Count == 0)
             return [];
 
         var oldestEntry = csvEntries.Min(x => x.RecordedAt);
@@ -91,12 +91,17 @@ public class ImportCsv(ILogger<ImportCsv> logger, TableClient bodyDataTableClien
         memoryStream.Position = 0;
         using var reader = new StreamReader(memoryStream);
 
+        // the actual data comes after the first two rows that contain metadata
+        // read header of metadata
+        await reader.ReadLineAsync();
+        // read single line belonging to metadata
+        await reader.ReadLineAsync();
+
         await using var csvReader = CsvReader.Create(reader,
             new CsvReaderOptions
             {
                 Separator = ',',
                 HasHeader = true,
-                ShouldSkipRecord = x => x.RowNumber <= 2,
                 SkipEmptyLines = true,
                 FormatProvider = CultureInfo.InvariantCulture
             });
