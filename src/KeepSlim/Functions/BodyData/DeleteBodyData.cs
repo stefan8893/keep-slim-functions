@@ -13,7 +13,7 @@ public class DeleteBodyData(ILogger<BodyDataFunction> logger, TableClient bodyDa
         logger.LogInformation("Deleting body data record");
         logger.LogDebug("Query String: {queryString}", queryString);
 
-        if (!DateTime.TryParse(queryString["recordedAt"], out var recordedAt))
+        if (!DateTime.TryParse(queryString["recordedAt"], CultureInfo.InvariantCulture, out var recordedAt))
         {
             logger.LogError("Missing record identifier.");
             var now = DateTime.Now.ToString(Constants.RowKeyDateTimeFormatString, CultureInfo.InvariantCulture);
